@@ -4,6 +4,8 @@ import { onSnapshot, collection, getDocs } from "firebase/firestore";
 import { AiOutlinePlusCircle } from "react-icons/ai";
 import DataTableComponent from "./DataTableComponent";
 import AddNew from "./AddNew";
+import { updateLocale } from "moment";
+import "moment/locale/tr";
 
 const List = () => {
   const [isLoading, setIsLoading] = useState(true);
@@ -13,6 +15,8 @@ const List = () => {
   const [isAddingNew, setIsAddingNew] = useState(false);
 
   useEffect(() => {
+    updateLocale("tr");
+
     getDocs(collection(db, "people")).then((querySnapshot) => {
       const peopleArr = [];
       querySnapshot.forEach((doc) => {
@@ -31,8 +35,6 @@ const List = () => {
 
       snapshot.forEach((d) => {
         const { name, price, is_paid, paid_at, paid_by, created_at } = d.data();
-
-        const date = new Date(created_at.seconds * 1000);
 
         if (!is_paid) {
           let person = thingsToPayArr.findIndex((p) => p.name === paid_by);
@@ -53,11 +55,15 @@ const List = () => {
           is_paid,
           paid_at,
           paid_by,
-          created_at: date.toLocaleDateString("tr-TR"),
+          created_at: created_at.seconds,
         });
       });
 
-      setThings(thingsArr);
+      setThings(
+        thingsArr
+          .sort((a, b) => b.created_at - a.created_at)
+          .map((thing, i) => ({ ...thing, order: ++i }))
+      );
       setThingsToPay(thingsToPayArr);
       setTimeout(() => setIsLoading(false), 20);
     });

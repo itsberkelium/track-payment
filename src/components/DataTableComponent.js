@@ -2,8 +2,15 @@ import { db } from "../utils/firebase";
 import { doc, updateDoc, deleteDoc } from "firebase/firestore";
 import { AiFillDelete } from "react-icons/ai";
 import DataTable from "react-data-table-component";
+import moment from "moment";
 
 const columns = [
+  {
+    name: "#",
+    selector: (row) => row.order,
+    sortable: true,
+    compacts: true,
+  },
   {
     name: "Başlık",
     selector: (row) => row.title,
@@ -30,6 +37,8 @@ const columns = [
     name: "Eklenme",
     selector: (row) => row.created_at,
     sortable: true,
+    format: (row) => moment(new Date(row.created_at * 1000)).fromNow(),
+    sortFunction: (a, b) => a.created_at - b.created_at,
   },
   {
     cell: (row) => {
@@ -82,6 +91,7 @@ const DataTableComponent = ({ things, isLoading }) => {
       progressPending={isLoading}
       conditionalRowStyles={conditionalRowStyles}
       onRowClicked={(row) => handleChangeStatus(row.id, !row.is_paid)}
+      defaultSortFieldId={1}
     />
   );
 };
