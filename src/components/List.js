@@ -38,9 +38,9 @@ const List = () => {
           let person = thingsToPayArr.findIndex((p) => p.name === paid_by);
 
           if (person > -1) {
-            thingsToPayArr[person].totalPay += parseFloat(price);
+            thingsToPayArr[person].totalPay += parseFloat(price) / 2;
           } else {
-            person = { name: paid_by, totalPay: parseFloat(price) };
+            person = { name: paid_by, totalPay: parseFloat(price) / 2 };
             thingsToPayArr.push(person);
           }
         }
