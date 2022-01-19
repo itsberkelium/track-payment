@@ -10,6 +10,8 @@ const columns = [
     selector: (row) => row.order,
     sortable: true,
     compacts: true,
+    maxWidth: "max-content",
+    minWidth: "max-content",
   },
   {
     name: "Başlık",
@@ -19,6 +21,8 @@ const columns = [
   {
     name: "Ücret",
     selector: (row) => row.price,
+    maxWidth: "max-content",
+    minWidth: "max-content",
   },
   {
     name: "Durum",
