@@ -91,9 +91,9 @@ const List = () => {
                   <span className="me-2">Bekleyen Toplam Ödeme:</span>
                   <span className="d-flex flex-column align-items-start">
                     {thingsToPay.map((person) => (
-                      <span
-                        key={person.name}
-                      >{`${person.name}: ₺${person.totalPay}`}</span>
+                      <span key={person.name}>{`${person.name}: ₺${parseFloat(
+                        person.totalPay
+                      ).toFixed(2)}`}</span>
                     ))}
                   </span>
                 </h6>
