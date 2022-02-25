@@ -70,7 +70,7 @@ const AddNew = ({ close, people }) => {
                 <div className="col-12">
                   <input
                     className="form-control"
-                    type="number"
+                    type="text"
                     name="price"
                     placeholder="Ücret:"
                     value={thing.price}
