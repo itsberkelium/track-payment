@@ -13,6 +13,7 @@ const List = () => {
   const [people, setPeople] = useState([]);
   const [thingsToPay, setThingsToPay] = useState([]);
   const [isAddingNew, setIsAddingNew] = useState(false);
+  const [thingsList, setThingsList] = useState([]);
 
   useEffect(() => {
     updateLocale("tr");
@@ -24,6 +25,19 @@ const List = () => {
       });
 
       setPeople(peopleArr);
+    });
+
+    getDocs(collection(db, "things_list")).then((querySnapshot) => {
+      const thingsArr = [];
+      querySnapshot.forEach((doc) => {
+        thingsArr.push({
+          name: doc.data().name,
+          id: doc.id,
+          price: doc.data().price,
+        });
+      });
+
+      setThingsList(thingsArr);
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -110,7 +124,11 @@ const List = () => {
         </div>
       </div>
       {isAddingNew && (
-        <AddNew people={people} close={() => setIsAddingNew(false)} />
+        <AddNew
+          people={people}
+          close={() => setIsAddingNew(false)}
+          things={thingsList}
+        />
       )}
     </>
   );

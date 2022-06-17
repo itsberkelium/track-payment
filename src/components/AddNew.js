@@ -2,12 +2,30 @@ import { addDoc, collection } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import { db } from "../utils/firebase";
 
-const AddNew = ({ close, people }) => {
+const MONTHS = [
+  "Ocak",
+  "Şubat",
+  "Mart",
+  "Nisan",
+  "Mayıs",
+  "Haziran",
+  "Temmuz",
+  "Ağustos",
+  "Eylül",
+  "Ekim",
+  "Kasım",
+  "Aralık",
+];
+
+const AddNew = ({ close, people, things }) => {
   const [thing, setThing] = useState({
+    predefined: "",
     name: "",
     price: "",
     is_paid: false,
     paid_by: "",
+    month: MONTHS[new Date().getMonth()],
+    year: new Date().getFullYear(),
   });
 
   useEffect(() => {
@@ -16,6 +34,45 @@ const AddNew = ({ close, people }) => {
       document.body.classList.remove("overflow-hidden");
     };
   }, []);
+
+  useEffect(() => {
+    if (thing.predefined) {
+      const selectedThing = things.find((t) => t.name === thing.predefined);
+
+      if (selectedThing && thing.name !== thing.predefined) {
+        setThing({
+          ...thing,
+          name: selectedThing.name,
+          price: selectedThing.price,
+        });
+        return;
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [thing.predefined]);
+
+  useEffect(() => {
+    if (thing.name) {
+      const selectedThing = things.find((t) => t.name === thing.name);
+
+      if (selectedThing && thing.predefined !== thing.name) {
+        setThing({
+          ...thing,
+          predefined: selectedThing.name,
+          price: selectedThing.price,
+        });
+        return;
+      }
+
+      if (!selectedThing) {
+        setThing({
+          ...thing,
+          predefined: "other",
+        });
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [thing.name]);
 
   const handleChange = ({ target }) =>
     setThing((prevThing) => ({
@@ -26,11 +83,12 @@ const AddNew = ({ close, people }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const { name, price, paid_by } = thing;
+    const { name, price, paid_by, month, year } = thing;
 
     if (name && parseFloat(price) && !isNaN(parseFloat(price)) && paid_by) {
       const docRef = await addDoc(collection(db, "things"), {
         ...thing,
+        name: `${name} (${month} ${year})`,
         price: parseFloat(thing.price).toFixed(2),
         created_at: new Date(),
       });
@@ -56,6 +114,24 @@ const AddNew = ({ close, people }) => {
               </div>
               <div className="row mb-3">
                 <div className="col-12">
+                  <select
+                    className="form-select"
+                    name="predefined"
+                    onChange={handleChange}
+                    value={thing.predefined}
+                  >
+                    <option hidden>Ödenen:</option>
+                    {things.map((thing) => (
+                      <option key={thing.id} value={thing.name}>
+                        {thing.name}
+                      </option>
+                    ))}
+                    <option value="other">Diğer</option>
+                  </select>
+                </div>
+              </div>
+              <div className="row mb-3">
+                <div className="col-12">
                   <input
                     className="form-control"
                     type="text"
@@ -64,6 +140,41 @@ const AddNew = ({ close, people }) => {
                     value={thing.name}
                     onChange={handleChange}
                   />
+                </div>
+              </div>
+              <div className="row mb-3">
+                <div className="col-6">
+                  <select
+                    className="form-select"
+                    name="month"
+                    onChange={handleChange}
+                    value={thing.month}
+                  >
+                    <option hidden>Ödenen Ay:</option>
+                    {Array.from({ length: 12 }, (_, i) => (
+                      <option key={i} value={MONTHS[i]}>
+                        {MONTHS[i]}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div className="col-6">
+                  <select
+                    className="form-select"
+                    name="year"
+                    onChange={handleChange}
+                    value={thing.year}
+                  >
+                    <option hidden>Ödenen Yıl:</option>
+                    {Array.from({ length: 5 }, (_, i) => (
+                      <option
+                        key={i}
+                        value={new Date().getFullYear() + (i - 1)}
+                      >
+                        {new Date().getFullYear() + (i - 1)}
+                      </option>
+                    ))}
+                  </select>
                 </div>
               </div>
               <div className="row mb-3">
@@ -90,7 +201,10 @@ const AddNew = ({ close, people }) => {
                     value={thing.is_paid}
                     onChange={handleChange}
                   />
-                  <label className="btn btn-outline-success" htmlFor="is_paid">
+                  <label
+                    className="btn btn-outline-success w-100"
+                    htmlFor="is_paid"
+                  >
                     {thing.is_paid ? `✅` : `⏳`}
                   </label>
                 </div>
