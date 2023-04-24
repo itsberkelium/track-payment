@@ -15,7 +15,7 @@ const Header = ({ user }) => {
           <div className="col-6 d-flex align-items-center">
             <div className="avatar rounded-circle">
               <img
-                src={`https://avatars.dicebear.com/api/miniavs/${user.name.toLowerCase()}.svg`}
+                src={`https://api.dicebear.com/6.x/adventurer-neutral/svg?seed=${user?.email}&radius=50`}
                 alt="avatar"
                 className="w-100 h-100 rounded-circle"
               />
